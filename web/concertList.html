@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concert List</title>
+<style>
+	@font-face {
+		font-family: 'Pretendard-Regular';
+		src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+		font-weight: 400;
+		font-style: normal;
+	}
+	body{
+		margin: 0;
+		padding: 0;
+		font-family: 'Pretendard-Regular';
+	}
+	.event-info {
+		align-items: center;
+		border: 1px solid #ccc;
+		padding: 10px;
+		margin-bottom: 20px;
+		display: flex;
+	}
+	.event-info img {
+		width: 300px;
+		height: 450px;
+		margin-right: 20px; /* 이미지와 내용 사이 간격 */
+	}
+	.event-info button {
+		margin: 10px 10px 0 ;
+	}
+	#eventsList{
+		margin: 0 100px;
+	}
+	#currentPage{
+		margin: 0 25px;
+	}
+	@media (min-width: 768px) {
+		div > .col-sm-3 {
+		width: 100px;
+		}
+	}
+	hr {
+		margin: 10px !important;
+	}
+	.title {
+		text-align: center;
+		font-family: Pretendard-Regular;
+		font-weight: 600;
+		font-size: 40px;
+		margin-bottom: 30px;
+	}
+	.row {
+		font-size: 15px;
+		font-family: Pretendard-Regular;
+		
+	}
+	.col-sm-3{
+		text-align: center;
+	}
+	#pagination{
+		margin-bottom: 30px;
+		font-family: Pretendard-Regular;
+	}
+	.interest-btn {
+		background-color: #f0f0f0; /* 기본 색상 */
+	}
+
+	.interest-btn.interest-selected {
+		background-color: #f7e0d1; /* 선택된 경우 색상 변경 */
+	}
+
+</style>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div> <h1 class="title">공연 정보</h1> </div>
+
+<div id="eventsList"></div>
+<div id="pagination" class="text-center">
+	<button onclick="prevPage()" class="btn btn-default">이전</button>
+	<span id="currentPage"></span>
+	<button onclick="nextPage()" class="btn btn-default">다음</button>
+</div>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">🎫 예매하기</h4>
+      </div>
+      <div class="modal-body">
+        <p>예매하시겠습니까?</p>
+      </div>
+      <div class="modal-footer">
+		<button type="button" class="btn btn-primary" data-dismiss="modal">Accept</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// XMLHttpRequest 객체 생성
+var xhttp = new XMLHttpRequest();
+
+// XML 파일의 URL 설정
+var key = "7a7a456a7879686b313030514d69784a"; // OpenAPI에서 발급된 인증키
+var type = "xml"; // 요청 파일 타입 (xml)
+var service = "culturalEventInfo"; // 서비스명 (culturalEventInfo)
+var currentPage = 1; // 현재 페이지
+var itemsPerPage = 10; // 페이지 당 항목 수
+
+// 페이지 번호를 받아 시작과 끝 위치를 계산하는 함수
+function calculateRange(page) {
+  var start = (page - 1) * itemsPerPage + 1;
+  var end = start + itemsPerPage - 1;
+  return [start, end];
+}
+
+// 페이지 로드 함수
+function loadPage(page) {
+  currentPage = page; // 현재 페이지 업데이트
+  var range = calculateRange(page);
+  var startIndex = range[0];
+  var endIndex = range[1];
+
+  // 버튼
+  var button = "button";
+  var btn = "btn";
+
+  // URL 설정
+  var url = "http://openapi.seoul.go.kr:8088/" + key + "/" + type + "/" + service + "/" + startIndex + "/" + endIndex + "/";
+
+  // 요청 초기화
+  xhttp.open("GET", url, true);
+
+  // 요청 완료 후 실행될 함수 설정
+  xhttp.onreadystatechange = function() {
+    // 요청이 완료되고 응답이 정상적으로 도착한 경우
+    if (this.readyState == 4 && this.status == 200) {
+      // XML 데이터 가져오기
+      var xmlDoc = this.responseXML;
+
+      // 행사 목록을 담을 div 요소 선택
+      var eventsListDiv = document.getElementById("eventsList");
+      eventsListDiv.innerHTML = ''; // 이전 항목 지우기
+
+      // 각 행사 정보 처리
+      var events = xmlDoc.getElementsByTagName("row");
+      for (var i = 0; i < events.length; i++) {
+        var title = events[i].getElementsByTagName("TITLE")[0].childNodes[0] ? events[i].getElementsByTagName("TITLE")[0].childNodes[0].nodeValue : "";
+        var date = events[i].getElementsByTagName("DATE")[0].childNodes[0] ? events[i].getElementsByTagName("DATE")[0].childNodes[0].nodeValue : "";
+        var place = events[i].getElementsByTagName("PLACE")[0].childNodes[0] ? events[i].getElementsByTagName("PLACE")[0].childNodes[0].nodeValue : "";
+        var org_name = events[i].getElementsByTagName("ORG_NAME")[0].childNodes[0] ? events[i].getElementsByTagName("ORG_NAME")[0].childNodes[0].nodeValue : "";
+        var use_trgt = events[i].getElementsByTagName("USE_TRGT")[0].childNodes[0] ? events[i].getElementsByTagName("USE_TRGT")[0].childNodes[0].nodeValue : "";
+        var use_fee = events[i].getElementsByTagName("USE_FEE")[0].childNodes[0] ? events[i].getElementsByTagName("USE_FEE")[0].childNodes[0].nodeValue : "";
+        var player = events[i].getElementsByTagName("PLAYER")[0].childNodes[0] ? events[i].getElementsByTagName("PLAYER")[0].childNodes[0].nodeValue : "";
+        var program = events[i].getElementsByTagName("PROGRAM")[0].childNodes[0] ? events[i].getElementsByTagName("PROGRAM")[0].childNodes[0].nodeValue : "";
+        var etc_desc = events[i].getElementsByTagName("ETC_DESC")[0].childNodes[0] ? events[i].getElementsByTagName("ETC_DESC")[0].childNodes[0].nodeValue : "";
+        var org_link = events[i].getElementsByTagName("ORG_LINK")[0].childNodes[0] ? events[i].getElementsByTagName("ORG_LINK")[0].childNodes[0].nodeValue : "";
+        var main_img = events[i].getElementsByTagName("MAIN_IMG")[0].childNodes[0] ? events[i].getElementsByTagName("MAIN_IMG")[0].childNodes[0].nodeValue : "";
+        var rgstdate = events[i].getElementsByTagName("RGSTDATE")[0].childNodes[0] ? events[i].getElementsByTagName("RGSTDATE")[0].childNodes[0].nodeValue : "";
+        var ticket = events[i].getElementsByTagName("TICKET")[0].childNodes[0] ? events[i].getElementsByTagName("TICKET")[0].childNodes[0].nodeValue : "";
+        var start_date = events[i].getElementsByTagName("STRTDATE")[0].childNodes[0] ? events[i].getElementsByTagName("STRTDATE")[0].childNodes[0].nodeValue : "";
+        var end_date = events[i].getElementsByTagName("END_DATE")[0].childNodes[0] ? events[i].getElementsByTagName("END_DATE")[0].childNodes[0].nodeValue : "";
+        var themecode = events[i].getElementsByTagName("THEMECODE")[0].childNodes[0] ? events[i].getElementsByTagName("THEMECODE")[0].childNodes[0].nodeValue : "";
+        var lot = events[i].getElementsByTagName("LOT")[0].childNodes[0] ? events[i].getElementsByTagName("LOT")[0].childNodes[0].nodeValue : "";
+        var lat = events[i].getElementsByTagName("LAT")[0].childNodes[0] ? events[i].getElementsByTagName("LAT")[0].childNodes[0].nodeValue : "";
+        var is_free = events[i].getElementsByTagName("IS_FREE")[0].childNodes[0] ? events[i].getElementsByTagName("IS_FREE")[0].childNodes[0].nodeValue : "";
+        var hmpg_addr = events[i].getElementsByTagName("HMPG_ADDR")[0].childNodes[0] ? events[i].getElementsByTagName("HMPG_ADDR")[0].childNodes[0].nodeValue : "";
+
+        // 행사 정보를 목록 형태로 표시
+        var eventInfo = document.createElement("div");
+        eventInfo.classList.add("event-info");
+
+        var mapLink = document.createElement("a");
+        mapLink.textContent = "지도보기";
+        mapLink.href = "https://www.google.com/maps/search/?api=1&query=" + lot + ", " + lat;
+        mapLink.target = "_blank";
+
+		// 이벤트 정보 
+		eventInfo.innerHTML = `
+
+							<img src="${main_img}" alt="Main Image">
+							<div class=content style="width:100%">
+								
+								<h3 style="margin: 20px; font-family: Pretendard-Regular; font-weight:600; font-size:30px">${title}</h3>
+								
+								<div class="row" >
+									<div class="col-sm-3"><strong>날짜</strong></div>
+									<div class="col-sm-9">${date}</div>
+								</div>
+								<hr style="margin:10px">
+								<div class="row">
+									<div class="col-sm-3"><strong>장소</strong></div>
+									<div class="col-sm-9">${place} <a href="${mapLink.href}" target="_blank">지도보기</a></div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-sm-3"><strong>기관명</strong></div>
+									<div class="col-sm-9">${org_name}</div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-sm-3"><strong>연령</strong></div>
+									<div class="col-sm-9">${use_trgt}</div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-sm-3"><strong>이용 요금</strong></div>
+									<div class="col-sm-9">${use_fee}</div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-sm-3"><strong>작품 소개</strong></div>
+									<div class="col-sm-9"><a href="${org_link}">보러가기</a></div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-sm-3"><strong>신청일</strong></div>
+									<div class="col-sm-9">${rgstdate}</div>
+								</div>
+								<hr>
+								<div class="row">
+								<button type="button" class="btn btn-default btn-sm col-sm-5 interest-btn" style="height:50px; font-size: 15px;">⭐ 관심상품</button>
+								<button type="button" class="btn btn-default btn-sm col-sm-5" data-toggle="modal" data-target="#myModal" style="height:50px; font-size: 15px;">🎫 예매하기</button>
+								</div>
+							</div>
+						</div>`;
+
+
+
+
+
+        eventsListDiv.appendChild(eventInfo);
+      }
+
+      // 현재 페이지 표시
+      document.getElementById("currentPage").innerText = currentPage;
+
+      // 페이지의 맨 위로 스크롤
+      window.scrollTo(0, 0);
+    }
+  };
+
+  // 요청 보내기
+  xhttp.send();
+}
+
+// 이전 페이지로 이동하는 함수
+function prevPage() {
+  if (currentPage > 1) {
+    loadPage(currentPage - 1);
+  }
+}
+
+// 다음 페이지로 이동하는 함수
+function nextPage() {
+  loadPage(currentPage + 1);
+}
+
+// 관심 상품 버튼의 색을 변경하는 함수
+function toggleInterest(button) {
+  $(button).toggleClass('interest-selected');
+}
+
+// 초기 페이지 로드
+loadPage(currentPage);
+
+// jQuery를 사용하여 관심 상품 버튼 클릭 시 색 변경
+$(document).ready(function(){
+  $(document).on('click', '.interest-btn', function(){
+    toggleInterest(this);
+  });
+});
+
+</script>
+
+</body>
+</html>

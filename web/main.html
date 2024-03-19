@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Main Page</title>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+    }
+    .title {
+		text-align: center;
+		font-family: Pretendard-Regular;
+		font-weight: 600;
+		font-size: 30px;
+		margin-bottom: 30px;
+	}
+    .container {
+        width: 90%;
+        margin-top: 20px;
+    }
+    .slider {
+        width: 100%;
+    }
+    .slider img {
+        width: 100%;
+        
+    }
+    .slider .slick-slide {
+        margin: 0 5px; /* 이미지 주위 여백을 추가*/
+    }
+
+</style>
+</head>
+<body>
+<div class="container">
+    <div> <h3 class="title">티켓 오픈</h3> </div>
+    <div class="slider" id="mainImages">
+        <!-- JavaScript로 추가 -->
+    </div>
+</div>
+
+<div>
+    <h2>추가할 항목 ... </h2>
+    <p>추가</p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script>
+    var xhttp = new XMLHttpRequest();
+
+    var key = "7a7a456a7879686b313030514d69784a";
+    var type = "xml"; 
+    var service = "culturalEventInfo"; 
+    var url = "http://openapi.seoul.go.kr:8088/" + key + "/" + type + "/" + service + "/1/12/"; // 12개의 데이터를 가져오도록 설정
+
+    // 요청 초기화
+    xhttp.open("GET", url, true);
+
+    // 요청 완료 후 실행될 함수 설정
+    xhttp.onreadystatechange = function() {
+        // 요청이 완료되고 응답이 정상적으로 도착한 경우
+        if (this.readyState == 4 && this.status == 200) {
+            // XML 데이터 가져오기
+            var xmlDoc = this.responseXML;
+
+            // 이미지를 가져와서 표시
+            var events = xmlDoc.getElementsByTagName("row");
+            var mainImagesDiv = document.getElementById("mainImages");
+
+            // 메인 이미지
+            for (var i = 1; i < 12; i++) { 
+                var main_img = events[i].getElementsByTagName("MAIN_IMG")[0].childNodes[0] ? events[i].getElementsByTagName("MAIN_IMG")[0].childNodes[0].nodeValue : "";
+
+                // 이미지를 생성하여 추가
+                if (main_img !== "") {
+                    var imgElement = document.createElement("div");
+                    imgElement.innerHTML = '<img src="' + main_img + '" alt="Main Image ' + (i + 1) + '">';
+                    mainImagesDiv.appendChild(imgElement);
+                }
+            }
+
+            // Slick Carousel 초기화
+            $('.slider').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 3000,
+                dots: true,
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 3,
+                            slidesToScroll: 1,
+                        }
+                    },
+                    {
+                        breakpoint: 768,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 1,
+                        }
+                    },
+                    {
+                        breakpoint: 640,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                        }
+                    }
+                ]
+            });
+        }
+    };
+
+    // 요청 보내기
+    xhttp.send();
+</script>
+
+</body>
+</html>
