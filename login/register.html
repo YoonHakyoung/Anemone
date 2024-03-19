@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 화면</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 24px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type=text], input[type=email], input[type=password] {
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 24px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .no-account {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .message {
+            text-align: center;
+            color: green;
+            margin-top: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>회원가입</h2>
+    <form id="registerForm" action="/auth/register" method="post">
+        <div class="container">
+            <label for="username"><b>사용자 이름</b></label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="email"><b>이메일 주소</b></label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password"><b>비밀번호</b></label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">회원가입</button>
+        </div>
+    </form>
+
+    <div class="message" id="registerMessage"></div> <!-- 메시지 출력을 위한 div 추가 -->
+</div>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    var username = document.getElementById("username").value;
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+
+    fetch("/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username: username,
+            email: email,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        var messageDiv = document.getElementById("registerMessage");
+        messageDiv.textContent = data.message;
+        if (data.success) {
+            // 회원가입 성공 시 홈페이지로 이동
+            window.location.href = "login.html";
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+});
+</script>
+
+</body>
+</html>

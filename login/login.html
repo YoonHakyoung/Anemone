@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        /* CSS 스타일은 여기에 넣으세요 */
+        /* 헤더 스타일 */
+        header {
+            background-color: #333; /* 회색 배경색 */
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* 네비게이션 바 스타일 */
+        nav {
+            overflow: hidden;
+            background-color: #333;
+            margin-top: 10px;
+        }
+
+        nav a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        /* 사이트 이름 스타일 */
+        h1 {
+            font-size: 24px;
+            margin-bottom: 0;
+        }
+
+        /* 폼 컨테이너 스타일 */
+        .form-container {
+            width: 300px;
+            margin: auto;
+            padding: 20px;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            padding: 16px;
+        }
+
+        .no-account {
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .social-icons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #333;
+            font-size: 24px; 
+        }
+
+        .social-icons a:hover {
+            color: #666; 
+        }
+
+        /* 푸터 스타일 */
+        footer {
+            background-color: #333; /* 회색 배경색 */
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>사이트 이름</h1>
+    <nav>
+        <a href="home.html">홈</a>
+        <a href="login.html">로그인</a>
+        <a href="register.html">회원가입</a>
+    </nav>
+</header>
+
+<div class="form-container">
+    <h2 style="text-align:center;">로그인 화면</h2>
+    <form id="loginForm" action="/login" method="post">
+        <div class="container">
+            <label for="email"><b>이메일 주소</b></label>
+            <input type="text" id="email" name="email" placeholder="아이디를 입력해주세요" required>
+    
+            <label for="password"><b>비밀번호</b></label>
+            <input type="password" id="password" name="password" placeholder="비밀번호를 입력해주세요" required>
+    
+            <button type="submit">로그인</button>
+        </div>
+
+        <div class="container no-account">
+            <p>계정이 없으신가요? <a href="/register">회원가입하기</a>.</p>
+        </div>
+    </form>
+    <div class="social-icons">
+        <a href="https://www.facebook.com/yourpage" target="_blank"><i class="fab fa-facebook"></i></a>
+        <a href="https://twitter.com/yourprofile" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.instagram.com/yourprofile" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+</div>
+
+<footer>
+    <p>© 2024 사이트 이름. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
